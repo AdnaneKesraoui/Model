@@ -1,0 +1,5 @@
+outs:
+- md5: a2fea02037f2a92865f7cc9a26703e68
+  size: 4000
+  hash: md5
+  path: val_labels.txt

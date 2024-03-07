@@ -75,6 +75,10 @@ target/
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
+# mlrun
+models/cardiffnlp_base_model/mlruns/
+
+
 
 # Mac OS-specific storage files
 .DS_Store
