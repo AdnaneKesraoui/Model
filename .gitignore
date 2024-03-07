@@ -75,8 +75,12 @@ target/
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
-# mlrun
+# mlruns
 models/cardiffnlp_base_model/mlruns/
+experiments/mlruns/
+
+# models
+models/
 
 
 
