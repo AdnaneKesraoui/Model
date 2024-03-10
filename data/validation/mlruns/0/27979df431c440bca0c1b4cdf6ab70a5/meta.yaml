@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/27979df431c440bca0c1b4cdf6ab70a5/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 27979df431c440bca0c1b4cdf6ab70a5
+run_name: capable-dolphin-813
+run_uuid: 27979df431c440bca0c1b4cdf6ab70a5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1710106909523
+status: 1
+tags: []
+user_id: adnan

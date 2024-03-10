@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/84ea67b3d7264f52855cdbdda47a16d0/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 84ea67b3d7264f52855cdbdda47a16d0
+run_name: respected-frog-223
+run_uuid: 84ea67b3d7264f52855cdbdda47a16d0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1710097536415
+status: 1
+tags: []
+user_id: adnan
