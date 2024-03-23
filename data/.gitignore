@@ -2,3 +2,5 @@
 /test_labels.txt
 /val_labels.txt
 /val_text.txt
+
+/validation/trained_sentiment_model

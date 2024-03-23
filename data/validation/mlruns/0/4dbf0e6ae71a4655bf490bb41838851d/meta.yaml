@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/4dbf0e6ae71a4655bf490bb41838851d/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 4dbf0e6ae71a4655bf490bb41838851d
+run_name: silent-duck-529
+run_uuid: 4dbf0e6ae71a4655bf490bb41838851d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1711139290431
+status: 1
+tags: []
+user_id: adnan
