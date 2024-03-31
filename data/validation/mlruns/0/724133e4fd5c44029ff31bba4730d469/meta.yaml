@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/724133e4fd5c44029ff31bba4730d469/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 724133e4fd5c44029ff31bba4730d469
+run_name: Cardiff NLP Sentiment Analysis Model
+run_uuid: 724133e4fd5c44029ff31bba4730d469
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1711899422920
+status: 1
+tags: []
+user_id: adnan
