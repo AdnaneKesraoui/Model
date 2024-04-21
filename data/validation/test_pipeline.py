@@ -66,7 +66,7 @@ def test_insert_preprocessed_tweets_into_cassandra(mock_connect):
     assert mock_session.execute.call_count == len(processed_texts)
     
     
-#Monitoring tests: Predicton quality has not regressed.
+#Monitoring tests: Prediction quality has not regressed.
 THRESHOLDS = {
     "accuracy": 0.8,
     "precision": 0.75,

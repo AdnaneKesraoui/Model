@@ -1,13 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[31]:
-
-
 import csv
 import urllib.request
 
-import great_expectations as ge
+#import great_expectations as ge
 import mlflow
 import numpy as np
 import pandas as pd
@@ -44,10 +38,6 @@ def preprocess_step(texts: list) -> list:
         preprocessed_texts.append(" ".join(new_text))
     return preprocessed_texts
 
-
-# In[32]:
-
-
 import uuid
 
 from cassandra.cluster import Cluster
@@ -73,10 +63,6 @@ def insert_preprocessed_tweets_into_cassandra(processed_texts: list):
     
     print("All preprocessed tweets have been inserted into Cassandra.")
     
-
-
-# In[33]:
-
 
 # from transformers import AutoModelForSequenceClassification, AutoTokenizer
 # import torch
@@ -106,8 +92,7 @@ def insert_preprocessed_tweets_into_cassandra(processed_texts: list):
 
 # @step
 # def train_model_step(texts: list, labels: list) -> str:
-#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+#     device = torch.device("cpu")
 #     task = 'sentiment'
 #     MODEL = f"cardiffnlp/twitter-roberta-base-{task}"
 #     tokenizer = AutoTokenizer.from_pretrained(MODEL)
@@ -119,7 +104,7 @@ def insert_preprocessed_tweets_into_cassandra(processed_texts: list):
 #     optimizer = AdamW(model.parameters(), lr=5e-5)
 
 #     model.train()
-#     for epoch in range(2):  # loop over the dataset multiple times
+#     for epoch in range(2):
 #         total_loss = 0.0
 #         for batch in tqdm(train_loader, desc=f"Training Epoch {epoch + 1}"):
 #             batch = {k: v.to(device) for k, v in batch.items()}
@@ -141,23 +126,15 @@ def insert_preprocessed_tweets_into_cassandra(processed_texts: list):
 
 #     return model_path
 
-
-# In[34]:
-
-
 @step
 def model_inference_step(texts: list) -> list:
     predictions = []
 
-    # Set the model path to the trained model directory
     model_path = 'trained_sentiment_model'
     
-    # Load tokenizer and model from your trained model directory
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForSequenceClassification.from_pretrained(model_path)
 
-    # Assuming you have label mappings like before in the `train_model_step`
-    # If they are stored differently for the new model, adjust as necessary.
     label_mapping = {'negative': 0, 'neutral': 1, 'positive': 2}
     labels = list(label_mapping.keys())
 
@@ -173,10 +150,6 @@ def model_inference_step(texts: list) -> list:
     return predictions
 
 
-
-# In[35]:
-
-
 @step
 def evaluate_predictions(predictions: list, true_labels: list) -> dict:
     predictions_mapped = [label_mapping[pred] for pred in predictions]
@@ -190,13 +163,10 @@ def evaluate_predictions(predictions: list, true_labels: list) -> dict:
     mlflow.log_metric("precision", precision)
     mlflow.log_metric("recall", recall)
     mlflow.log_metric("f1_score", f1)
+
+
     
     return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
-
-
-# In[36]:
-
-
 import matplotlib.pyplot as plt
 
 
@@ -216,11 +186,6 @@ def visualize_metrics(metrics: dict) -> str:
     plt.close()
     
     return figure_path
-
-
-# In[37]:
-
-
 @pipeline
 def sentiment_analysis_pipeline_with_evaluation(file_path: str, labels_path: str):
     tweets = read_tweets_from_file(file_path)
@@ -230,7 +195,6 @@ def sentiment_analysis_pipeline_with_evaluation(file_path: str, labels_path: str
     #train_model_step(processed_texts, true_labels)
     predictions = model_inference_step(processed_texts)
     evaluation_results = evaluate_predictions(predictions, true_labels)
-    visualize_metrics(evaluation_results)
     
 
     
@@ -240,10 +204,6 @@ if __name__ == "__main__":
     labels_path = '../val_labels.txt' 
     sentiment_analysis_pipeline_with_evaluation(file_path, labels_path)
     
-
-
-# In[38]:
-
 
 # CASSANDRA_CLUSTER = ['localhost']
 # KEYSPACE = 'mykeyspace'
@@ -258,27 +218,41 @@ if __name__ == "__main__":
 #         print(f"ID: {row.id}, Tweet: {row.tweet_text}")
 # fetch_and_print_preprocessed_tweets()
 
+from mlflow.tracking import MlflowClient
 
-# In[ ]:
+#Monitoring tests: Prediction quality has not regressed.
+THRESHOLDS = {
+    "accuracy": 0.8,
+    "precision": 0.75,
+    "recall": 0.8,
+    "f1": 0.75
+}
 
+def fetch_latest_metrics(experiment_name):
+    client = MlflowClient()
+    experiment = client.get_experiment_by_name(experiment_name)
+    if not experiment:
+        return "Experiment not found."
+    
+    runs = client.search_runs(experiment_ids=[experiment.experiment_id], order_by=["start_time DESC"], max_results=1)
+    if not runs:
+        return "No runs found."
+    
+    return runs[0].data.metrics
 
-import pytest
+def check_metrics_against_thresholds(metrics):
+    if isinstance(metrics, str):
+        return [metrics]  # Return the error message as a list
+    alerts = []
+    for metric, threshold in THRESHOLDS.items():
+        if metric in metrics and metrics[metric] < threshold:
+            alerts.append(f"Alert: {metric} dropped below threshold. Value: {metrics[metric]}, Threshold: {threshold}")
+        else :
+            alerts.append(f"Metric {metric} is within the threshold")
+    return alerts
 
-
-def test_read_tweets_from_file():
-    tweets = read_tweets_from_file('../val_text.txt')
-    assert isinstance(tweets, list)
-    assert all(isinstance(tweet, str) for tweet in tweets)
-
-def test_preprocess_step():
-    test_tweets = [
-        "@user1 this is a test! http://testurl.com",
-        "Normal text without users or urls"
-    ]
-    expected_output = [
-        "@user this is a test! http",
-        "Normal text without users or urls"
-    ]
-    preprocessed = preprocess_step(test_tweets)
-    assert preprocessed == expected_output
-
+experiment_name = "Default"
+metrics = fetch_latest_metrics(experiment_name)
+alerts = check_metrics_against_thresholds(metrics)
+for alert in alerts:
+    print(alert)

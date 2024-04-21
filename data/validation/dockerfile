@@ -1,0 +1,21 @@
+# Use an official lightweight Python image.
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
+
+# Set environment variables to reduce Python buffering and allow logs to be seen immediately.
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set the working directory in the container to /app.
+WORKDIR /app
+
+# Copy the requirements.txt file into the container at /app.
+COPY ./requirements.txt /app/requirements.txt
+
+# Install the Python dependencies.
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+
+# Copy the local directory files into the container.
+COPY . /app
+
+# Command to run the uvicorn server on container start.
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
