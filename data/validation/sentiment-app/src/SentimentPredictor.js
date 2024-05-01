@@ -1,9 +1,11 @@
+import { Box, Button, TextField, Typography } from '@material-ui/core';
 import axios from 'axios';
 import React, { useState } from 'react';
 
 function SentimentPredictor() {
   const [text, setText] = useState('');
   const [sentiment, setSentiment] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleInputChange = (event) => {
     setText(event.target.value);
@@ -12,28 +14,52 @@ function SentimentPredictor() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post(' https://employee-reviews-model-yyxax4dhpq-no.a.run.app/predict', { text });
+      const response = await axios.post('https://employee-reviews-updated-yyxax4dhpq-no.a.run.app/predict', { text });
       setSentiment(response.data.sentiment);
+      setError(null);
     } catch (error) {
       console.error('Error fetching sentiment:', error);
-      setSentiment('Error fetching sentiment');
+      setSentiment(null);
+      setError('Error fetching sentiment');
     }
   };
 
   return (
-    <div>
-      <h1>Sentiment Predictor</h1>
+    <Box display="flex" flexDirection="column" alignItems="center" mt={4}>
+      <Typography variant="h4" gutterBottom>Employee Reviews</Typography>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="text"
+          label="Enter text here..."
+          name="text"
           value={text}
           onChange={handleInputChange}
-          placeholder="Enter text here..."
         />
-        <button type="submit">Predict Sentiment</button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          style={{ marginTop: '1rem' }}
+        >
+          Submit
+        </Button>
       </form>
-      {sentiment !== null && <h2>Sentiment: {sentiment}</h2>}
-    </div>
+      {sentiment && (
+        <Typography variant="h5" style={{ marginTop: '1rem' }}>
+          Sentiment: {sentiment}
+        </Typography>
+      )}
+      {error && (
+        <Typography variant="h5" color="error" style={{ marginTop: '1rem' }}>
+          {error}
+        </Typography>
+      )}
+    </Box>
   );
 }
 
