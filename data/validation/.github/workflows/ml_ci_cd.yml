@@ -43,7 +43,7 @@ jobs:
         if: always()
         run: python -m zenml down
 
-      - name: Log Metrics to MLflow (optional)
+      - name: Log Metrics to MLflow
         run: |
           pip install mlflow
           mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --host
