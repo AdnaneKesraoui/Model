@@ -33,7 +33,7 @@ from bson import ObjectId  # Import this at the top of your file
 from fastapi import FastAPI, File, UploadFile
 
 
-@app.post("/predict_file")
+@app.post("/predict")
 async def predict_sentiment_file(file: UploadFile = File(...)):
     contents = await file.read()
     texts = contents.decode('utf-8').splitlines()
