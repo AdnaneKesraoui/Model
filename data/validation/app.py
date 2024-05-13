@@ -12,6 +12,7 @@ client = AsyncIOMotorClient(MONGO_DETAILS)
 db = client.sentiments 
 collection = db.sentiment_data 
 
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
