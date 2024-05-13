@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 
-from pipeline import model_inference_step
+from pipeline import model_inference_step, preprocess_step
 
 app = FastAPI()
 
@@ -27,18 +27,32 @@ app.add_middleware(
 class TextRequest(BaseModel):
     text: str
 
-@app.post("/predict")
-async def predict_sentiment(text_request: TextRequest):
-    text = text_request.text
-    predictions = model_inference_step([text])  # assume this returns the sentiment prediction
+from typing import List
 
-    sentiment_document = {
-        "text": text,
-        "sentiment": predictions[0]
-    }
-    
-    await collection.insert_one(sentiment_document)  # insert the document into MongoDB
-    return {"sentiment": predictions[0]}
+from bson import ObjectId  # Import this at the top of your file
+from fastapi import FastAPI, File, UploadFile
+
+
+@app.post("/predict_file")
+async def predict_sentiment_file(file: UploadFile = File(...)):
+    contents = await file.read()
+    texts = contents.decode('utf-8').splitlines()
+    results = []
+
+    for text in texts:
+        preprocessed_text = preprocess_step([text])  # Ensure text is passed as a list
+        prediction = model_inference_step(preprocessed_text)  # Assume this function can handle a list of texts
+        sentiment_document = {
+            "text": text,
+            "sentiment": prediction[0]
+        }
+        insert_result = await collection.insert_one(sentiment_document)  # Insert the document into MongoDB
+        sentiment_document['_id'] = str(insert_result.inserted_id)  # Convert ObjectId to string
+        results.append(sentiment_document)
+
+    return results
+
+
 
 
 if __name__ == "__main__":
