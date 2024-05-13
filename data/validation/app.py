@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 
-from pipeline import model_inference_step, preprocess_step
+from pipeline import model_inference_step
 
 app = FastAPI()
 
@@ -40,8 +40,7 @@ async def predict_sentiment_file(file: UploadFile = File(...)):
     results = []
 
     for text in texts:
-        preprocessed_text = preprocess_step([text])  # Ensure text is passed as a list
-        prediction = model_inference_step(preprocessed_text)  # Assume this function can handle a list of texts
+        prediction = model_inference_step([text])  # Get sentiment prediction for each line
         sentiment_document = {
             "text": text,
             "sentiment": prediction[0]
@@ -51,7 +50,6 @@ async def predict_sentiment_file(file: UploadFile = File(...)):
         results.append(sentiment_document)
 
     return results
-
 
 
 
